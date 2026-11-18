@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MOZ פיתוח טעמים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap">
+<style>
+/* העיצוב לפי מערכת ההזמנות ומתכנן הביקורים. מסך 1: טעם בעבודה, שלוש גרסאות. תצוגה מקומית בלבד. */
+:root {
+  --bg: #f4f6f2; --surface: #ffffff; --surface-2: #f2f5ef; --ink: #3a3f3b; --muted: #767d76; --line: #e1e6dd;
+  --accent: #506954; --accent-strong: #3d5241; --accent-ink: #ffffff; --accent-soft: #e2fbeb; --accent-mid: #9db694;
+  --gold: #e4c679; --danger: #c2372b; --c-orange: #f07c1e;
+  --shadow-sm: 0 1px 2px rgba(15, 27, 45, .06), 0 1px 3px rgba(15, 27, 45, .05);
+  --shadow-lg: 0 12px 32px rgba(15, 27, 45, .14), 0 2px 6px rgba(15, 27, 45, .06);
+  --font-body: "Rubik", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --radius: 14px; color-scheme: light;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.45; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: flex; align-items: center; gap: 10px; background: var(--surface); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 20;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; }
+header.top img { height: 30px; display: block; }
+header.top .t { flex: 1; font-weight: 800; color: var(--accent); font-size: 16px; white-space: nowrap; }
+header.top .t small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); line-height: 1.1; }
+header.top .t small.bad { color: var(--danger); }
+header.top .round { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; font-size: 14px; border-radius: 999px; padding: 5px 12px; white-space: nowrap; }
+
+main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
+.label { font-size: 13px; color: var(--muted); font-weight: 700; letter-spacing: .03em; margin: 16px 2px 8px; }
+
+/* בחירת טעם */
+.flavors { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 2px 6px; }
+.flavors::-webkit-scrollbar { display: none; }
+.flavors button { flex: none; height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 600; white-space: nowrap; }
+.flavors button.newf { border-style: dashed; border-color: var(--accent-mid); color: var(--accent); font-weight: 700; }
+.flavors button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 800; }
+
+/* שלוש הגרסאות */
+.versions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.versions button { border: 2px solid transparent; background: var(--surface); border-radius: var(--radius); padding: 10px 6px 9px; box-shadow: var(--shadow-sm); text-align: center; min-width: 0; }
+.versions button b { display: block; font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.versions button span { display: block; font-size: 13.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.versions button em { display: block; font-style: normal; font-weight: 700; font-size: 14px; margin-top: 3px; }
+.versions button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.versions button.win::after { content: "★ נבחרה"; display: block; font-size: 12px; font-weight: 800; color: #8a6d16; margin-top: 2px; }
+
+.card { background: var(--surface); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-sm); margin-top: 12px; }
+.nick { display: flex; gap: 8px; align-items: center; }
+.nick input { flex: 1; min-width: 0; height: 46px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; background: var(--surface-2); font-weight: 600; }
+.hint { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+/* כמה מכינים */
+.batch { display: flex; align-items: center; gap: 10px; }
+.batch .grow { flex: 1; font-weight: 600; }
+.step { display: inline-flex; align-items: center; background: var(--surface-2); border-radius: 12px; }
+.step button { width: 48px; height: 48px; border: 0; background: none; font-size: 26px; font-weight: 700; color: var(--accent); border-radius: 12px; }
+.step button:active { background: var(--accent-soft); }
+.step output { min-width: 34px; text-align: center; font-weight: 800; font-size: 19px; }
+
+/* שורות חומרי גלם */
+.ing { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ing:last-of-type { border-bottom: 0; }
+.ing .name { font-weight: 700; font-size: 18px; min-width: 0; }
+.ing .sub { grid-column: 1; color: var(--muted); font-size: 12.5px; }
+.ing .sub.warn { color: var(--c-orange); font-weight: 600; }
+.ing .qty { grid-row: 1 / span 2; grid-column: 2; display: flex; align-items: center; gap: 4px; }
+.ing .qty button { width: 44px; height: 48px; border: 0; background: var(--surface-2); border-radius: 12px; font-size: 24px; font-weight: 700; color: var(--accent); }
+.ing .qty button:active { background: var(--accent-soft); }
+.ing .qty input { width: 82px; height: 48px; text-align: center; border: 1.5px solid var(--line); border-radius: 12px; font-size: 20px; font-weight: 800; background: #fff; direction: ltr; }
+.ing .qty small { color: var(--muted); font-size: 13px; width: 22px; }
+.changed .qty input { border-color: var(--gold); background: #fffaea; }
+.add { width: 100%; height: 50px; margin-top: 10px; border-radius: 12px; border: 1.5px dashed var(--accent-mid); background: none; color: var(--accent); font-weight: 700; }
+.row-btns { display: flex; gap: 8px; margin-top: 12px; }
+.btn { flex: 1; height: 48px; border-radius: 12px; border: 0; background: var(--surface-2); font-weight: 700; font-size: 15.5px; }
+.btn.primary { background: var(--accent); color: #fff; box-shadow: 0 2px 6px rgba(80,105,84,.25); }
+.btn.gold { background: var(--gold); color: #2d2a1c; }
+.btn.danger { color: var(--danger); }
+
+/* סיכום קבוע למטה */
+.sum { position: fixed; inset-inline: 0; bottom: 0; z-index: 30; background: var(--surface); box-shadow: var(--shadow-lg); border-radius: 20px 20px 0 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.sum .in { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; align-items: end; }
+.sum .k { color: var(--muted); font-size: 13px; }
+.sum .v { font-weight: 800; font-size: 22px; color: var(--accent-strong); }
+.sum .v small { font-size: 14px; font-weight: 600; color: var(--muted); }
+.sum .note { grid-column: 1 / -1; font-size: 13.5px; color: var(--c-orange); font-weight: 600; }
+
+/* חלון תחתון */
+.scrim { position: fixed; inset: 0; background: rgba(20, 28, 22, .45); z-index: 40; display: flex; align-items: flex-end; }
+.sheet { background: var(--bg); width: 100%; max-height: 82vh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 16px 16px calc(18px + env(safe-area-inset-bottom, 0px)); }
+.sheet h3 { margin: 0 0 10px; font-size: 19px; color: var(--accent); }
+.sheet .pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sheet .pick button { height: 50px; border-radius: 12px; border: 0; background: var(--surface); box-shadow: var(--shadow-sm); font-weight: 600; }
+.sheet input.search { width: 100%; height: 48px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; margin-bottom: 10px; background: #fff; }
+.newmat { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.hbtn { height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: 14px; color: var(--accent); }
+.prow { display: grid; grid-template-columns: 1fr 96px auto; align-items: center; gap: 8px; background: var(--surface); border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; box-shadow: var(--shadow-sm); font-weight: 600; }
+.prow input { height: 44px; text-align: center; border: 1.5px solid var(--line); border-radius: 10px; font-weight: 800; font-size: 17px; direction: ltr; background: #fff; width: 100%; }
+.prow small { color: var(--muted); font-size: 12.5px; }
+.prow.miss input { border-color: var(--c-orange); background: #fff6ec; }
+.bigw { font-weight: 800; font-size: 20px; color: var(--accent-strong); margin-top: 2px; }
+.ing .qty button.unit { width: 46px; font-size: 14px; font-weight: 800; background: var(--surface); border: 1.5px solid var(--accent-mid); color: var(--accent-strong); line-height: 1.05; }
+.ing .qty button.unit.kg { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ing .qty input { width: 76px; }
+.hround { background: var(--surface); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+.hround > b { display: block; color: var(--accent); font-size: 17px; margin-bottom: 6px; }
+.hver { border-top: 1px solid var(--line); padding: 10px 0 4px; }
+.hver .ht { display: flex; gap: 8px; align-items: baseline; font-weight: 800; }
+.hver .ht span { flex: 1; font-weight: 600; }
+.hver .ht em { font-style: normal; color: var(--muted); font-weight: 700; font-size: 14px; }
+.hver.win .ht b::after { content: " ★"; color: #b08a1a; }
+.hver .hn { background: #fff8e3; border-radius: 10px; padding: 6px 10px; margin: 6px 0; font-size: 14.5px; }
+.hver .hi { color: var(--ink); font-size: 14.5px; line-height: 1.7; }
+.hver .hi i { font-style: normal; color: var(--muted); }
+.hver button { height: 40px; padding: 0 14px; margin: 6px 0 4px; border-radius: 10px; border: 1.5px solid var(--accent-mid); background: none; color: var(--accent); font-weight: 700; font-size: 14px; }
+.card.stage { background: #fff8e3; border: 1.5px solid var(--gold); }
+.card.stage.ok { background: var(--accent-soft); border-color: var(--accent-mid); }
+.st-t { font-weight: 800; font-size: 19px; color: var(--accent-strong); }
+.flavors button .tag { font-size: 12px; font-weight: 700; opacity: .8; margin-inline-start: 6px; }
+.toast { position: fixed; top: 76px; inset-inline: 0; margin: auto; width: max-content; max-width: 90vw; background: var(--accent-strong); color: #fff; padding: 10px 16px; border-radius: 999px; font-weight: 600; z-index: 60; box-shadow: var(--shadow-lg); }
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="data:image/png;base64,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" alt="MOZ">
+  <div class="t">פיתוח טעמים<small id="sync"></small></div>
+  <button class="hbtn" id="pricesBtn">מחירון</button>
+  <div class="round" id="round"></div>
+</header>
+<main>
+  <div class="label">על איזה טעם עובדים?</div>
+  <div class="flavors" id="flavors"></div>
+
+  <div class="label" id="verLabel">שלוש גרסאות. לוחצים על גרסה כדי לראות ולשנות אותה</div>
+  <div class="versions" id="versions"></div>
+
+  <div class="card stage" id="stageCard" hidden>
+    <div class="st-t" id="stageTitle"></div>
+    <div class="hint" id="stageText"></div>
+    <div class="row-btns" id="stageBtns"></div>
+  </div>
+
+  <div class="card" id="nickCard">
+    <div class="nick"><input id="nick" maxlength="30" placeholder="מה מיוחד בגרסה? למשל: מתוקה יותר" aria-label="שם הגרסה"></div>
+    <div class="hint" id="diff"></div>
+  </div>
+
+  <div class="card">
+    <div class="batch">
+      <div class="grow">כמה יח׳ מכינים?<div class="hint" style="margin:0" id="unitHint">יח׳ = <span id="unitG"></span> גרם</div><div class="bigw" id="bigW" hidden></div></div>
+      <div class="step"><button id="cupMinus" aria-label="פחות">−</button><output id="cups"></output><button id="cupPlus" aria-label="יותר">+</button></div>
+    </div>
+  </div>
+
+  <div class="card" id="noteCard">
+    <div class="nick"><input id="note" maxlength="140" placeholder="איך יצא בטעימה? למשל: מתוק מדי" aria-label="הערת טעימה"></div>
+  </div>
+
+  <div class="card" id="ingCard">
+    <div id="ings"></div>
+    <button class="add" id="addBtn">+ הוסף חומר גלם</button>
+    <div class="row-btns" id="devBtns">
+      <button class="btn" id="copyBtn">העתק מגרסה אחרת</button>
+      <button class="btn gold" id="winBtn">★ זו הכי טעימה</button>
+    </div>
+  </div>
+  <button class="add" id="histBtn" style="background:var(--surface)"></button>
+</main>
+
+<div class="sum"><div class="in">
+  <div><div class="k">סה״כ בקערה</div><div class="v"><span id="sumG"></span> <small id="sumUnit">גרם</small></div></div>
+  <div><div class="k">עלות חומרי גלם ליח׳</div><div class="v"><span id="sumCost"></span> <small>₪</small></div></div>
+  <div class="note" id="sumNote" hidden></div>
+</div></div>
+
+<div class="scrim" id="scrim" hidden><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+const BOOT = /*BOOT*/null/*END*/;
+const UIKEY = "moz-recipe-lab-ui";
+const LETTERS = ["א", "ב", "ג"];
+const $ = id => document.getElementById(id);
+let SEED = { unit: 245, cutter: 70 }, ME = { name: "", role: "cook" };
+let S;   // S = { flavor, version, materials: [{name, price}], flavors: {name: {rev, round, cups, stage, winner, versions:[{nick, note, ing:[{name,g,u}]}], history:[]}} }
+
+const API = "https://script.google.com/macros/s/AKfycbyiC8mBYcu0h13ClGiptRCsH3JsYVSpQGnno0F8I7d6xoQ0P3UR6XINXFAtt3KM5trN/exec";   // רק בדף הסטטי (dist/site): כתובת הפריסה של Apps Script
+/* השרת, שלוש צורות:
+   1. תצוגה מקומית: שרת מדומה שמריץ את אותה לוגיקה (server/core.js).
+   2. דף סטטי שמתארח מחוץ ל-Google: בקשת רשת ל-doPost, בלי עוגיות, כדי שחשבונות Google שמחוברים בדפדפן לא ישפיעו.
+      המפתח האישי מגיע מהקישור (#k= או ?k=) ולא נשמר בשום מקום.
+   3. בתוך Apps Script: google.script.run. */
+const NOLINK = "אין חיבור. בודקים אינטרנט ומנסים שוב.";
+const linkKey = () => new URLSearchParams(location.hash.slice(1)).get("k") || new URLSearchParams(location.search).get("k") || "";
+const Backend = window.MockBackend || (API ? {
+  call: (action, payload) => fetch(API, {
+    method: "POST", credentials: "omit", redirect: "follow", cache: "no-store", referrerPolicy: "no-referrer",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },   // text/plain: בלי בקשת הכנה (preflight), ש-Apps Script לא עונה לה
+    body: JSON.stringify({ k: linkKey(), action, payload: payload || {} })
+  }).then(r => { if (!r.ok) throw 0; return r.json(); }).catch(() => { throw new Error(NOLINK); })
+    .then(r => { if (r && r.ok) return r.data; throw new Error(r && r.message ? r.message : "אין תשובה מהשרת"); })
+} : {
+  call: (action, payload) => new Promise((res, rej) => google.script.run
+    .withSuccessHandler(r => r && r.ok ? res(r.data) : rej(new Error(r && r.message ? r.message : "אין תשובה מהשרת")))
+    .withFailureHandler(() => rej(new Error(NOLINK)))
+    .api(BOOT.k, action, payload))
+});
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+const stateOf = f => ({ round: f.round, cups: f.cups, stage: f.stage || "dev", winner: f.winner == null ? null : f.winner, doneAt: f.doneAt || "", versions: f.versions });
+const synced = {}, timers = {}, busy = {};
+let failed = false;
+function showSync() {
+  const pending = Object.keys(S.flavors).some(n => busy[n] || timers[n]);
+  const el = $("sync"); el.classList.toggle("bad", failed);
+  el.textContent = failed ? "לא נשמר, אין חיבור" : pending ? "שומר…" : "נשמר ✓";
+}
+function dirty(name) { const f = S.flavors[name]; return JSON.stringify(stateOf(f)) !== synced[name] || f.history.some(h => !h.saved); }
+function push(name) {
+  timers[name] = null;
+  const f = S.flavors[name];
+  if (!f || busy[name] || !dirty(name)) { showSync(); return; }
+  busy[name] = true; showSync();
+  const state = stateOf(f), snap = JSON.stringify(state), hist = f.history.filter(h => !h.saved);
+  Backend.call("saveFlavor", { name, state, rev: f.rev, history: hist.map(h => ({ hid: h.hid, round: h.round, stage: h.stage || "dev", at: h.at, winner: h.winner, versions: h.versions })) })
+    .then(r => {
+      busy[name] = false; failed = false;
+      if (r.conflict) {
+        S.flavors[name] = adopt(r.flavor); synced[name] = JSON.stringify(stateOf(S.flavors[name]));
+        if (S.flavor === name) { S.version = Math.min(S.version, S.flavors[name].versions.length - 1); closeSheet(); render(); }
+        toast("מישהו אחר שינה את " + name + ". נטען המצב העדכני");
+      } else {
+        f.rev = r.rev; synced[name] = snap; hist.forEach(h => h.saved = true);
+        if (dirty(name)) schedule(name, 300);
+      }
+      showSync();
+    })
+    .catch(e => { busy[name] = false; failed = true; showSync(); toast(e.message); schedule(name, 8000); });
+}
+function schedule(name, ms) { clearTimeout(timers[name]); timers[name] = setTimeout(() => push(name), ms); showSync(); }
+function adopt(f) { f.history = (f.history || []).map(h => ({ ...h, saved: true })); return f; }
+
+const fmt = (n, d = 0) => Number(n).toLocaleString("he-IL", { minimumFractionDigits: d, maximumFractionDigits: d });
+const gfmt = g => g >= 10 ? fmt(g, g % 1 ? 1 : 0) : fmt(g, g % 1 ? (g < 1 ? 2 : 1) : 0);
+const mats = () => S.materials;
+const price = name => (mats().find(m => m.name === name) || {}).price;
+const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) && n >= 0 ? n : null; };
+/* נקרא אחרי כל שינוי: זוכר מה פתוח במסך, ושולח לשרת כל טעם שהשתנה, אחרי שנייה של שקט */
+const save = () => {
+  try { localStorage.setItem(UIKEY, JSON.stringify({ flavor: S.flavor, version: S.version })); } catch (e) {}
+  for (const n of Object.keys(S.flavors)) if (dirty(n)) schedule(n, 900);
+};
+const cur = () => S.flavors[S.flavor];
+const today = () => new Date().toISOString().slice(0, 10);
+const ver = () => cur().versions[S.version];
+const total = v => v.ing.reduce((a, i) => a + i.g, 0);
+/* עלות ליחידה: מה שבאמת רשום במתכון (גרם × מחיר), בלי פחת. full = כמה תעלה יחידה מלאה לפי אותו יחס */
+function cost(v) {
+  const t = total(v); if (!t) return { c: 0, full: 0, missing: [] };
+  const missing = v.ing.filter(i => i.g > 0 && price(i.name) == null).map(i => i.name);
+  const c = v.ing.reduce((a, i) => a + i.g * (price(i.name) || 0) / 1000, 0);
+  return { c, full: c * SEED.unit / t, missing };
+}
+function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2200); }
+
+
+function render() {
+  const f = cur(), v = ver();
+  const stage = f.stage || "dev", dev = stage === "dev";
+  $("round").textContent = dev ? "סבב " + f.round : stage === "cutter" ? "קאטר" : "עבר בקאטר";
+  const tw = total(v) * f.cups;
+  $("unitHint").hidden = !dev;
+  $("bigW").hidden = dev; $("bigW").textContent = `${f.cups} יח׳ = ${tw >= 1000 ? fmt(tw / 1000, 2) + " ק״ג" : gfmt(+tw.toFixed(1)) + " גרם"}`;
+  $("verLabel").hidden = $("versions").hidden = $("nickCard").hidden = $("devBtns").hidden = !dev;
+  $("stageCard").hidden = dev; $("stageCard").classList.toggle("ok", stage === "done");
+  if (!dev) {
+    $("stageTitle").textContent = stage === "cutter" ? "בדיקה בקאטר: כמות ראשונה" : "✓ הטעם עבר בקאטר";
+    $("stageText").textContent = stage === "cutter"
+      ? "מכינים את הגרסה שנבחרה בכמות של קאטר, כדי לוודא שהטעם נשמר גם בכמות גדולה. הכמויות למטה כבר מוכפלות."
+      : "המתכון הסופי למטה. אפשר לחזור לשיפור אם רוצים לשנות משהו.";
+    $("stageBtns").innerHTML = (stage === "cutter" ? '<button class="btn primary" id="cutOk">✓ הטעם עבר</button>' : "") + '<button class="btn" id="cutBack">חוזרים לשיפור</button>';
+    if ($("cutOk")) $("cutOk").onclick = () => { f.stage = "done"; f.doneAt = new Date().toISOString().slice(0, 10); save(); render(); toast("נרשם: הטעם עבר בקאטר"); };
+    $("cutBack").onclick = () => {
+      const w = f.versions[0];
+      f.history.push({ hid: uid(), at: today(), round: f.round, stage, versions: f.versions });
+      f.versions = LETTERS.map((_, i) => ({ nick: i ? "" : "אחרי קאטר", ing: w.ing.map(y => ({ ...y })) }));
+      f.stage = "dev"; f.round++; f.winner = null; f.cups = 1; S.version = 0; save(); render(); toast("חזרנו לשיפור, סבב " + f.round);
+    };
+  }
+  $("unitG").textContent = SEED.unit;
+  $("flavors").innerHTML = "";
+  for (const name of Object.keys(S.flavors)) {
+    const b = document.createElement("button"); b.textContent = name; b.setAttribute("aria-pressed", name === S.flavor);
+    const stg = S.flavors[name].stage; if (stg === "cutter" || stg === "done") { const tg = document.createElement("span"); tg.className = "tag"; tg.textContent = stg === "done" ? "✓" : "קאטר"; b.append(tg); }
+    b.onclick = () => { S.flavor = name; S.version = 0; save(); render(); };
+    $("flavors").append(b);
+  }
+  const nb = document.createElement("button"); nb.textContent = "+ טעם חדש"; nb.className = "newf"; nb.onclick = newFlavor; $("flavors").append(nb);
+  $("versions").innerHTML = "";
+  f.versions.forEach((x, i) => {
+    const b = document.createElement("button"); b.setAttribute("aria-pressed", i === S.version); if (f.winner === i) b.className = "win";
+    b.innerHTML = `<b>${LETTERS[i]}</b><span></span><em>${fmt(cost(x).c, 2)} ₪</em>`;
+    b.querySelector("span").textContent = x.nick || "בלי שם";
+    b.onclick = () => { S.version = i; save(); render(); };
+    $("versions").append(b);
+  });
+  $("nick").value = v.nick;
+  $("note").value = v.note || "";
+  $("histBtn").textContent = f.history.length ? `היסטוריה של ${S.flavor} (${f.history.length} ${f.history.length === 1 ? "סבב קודם" : "סבבים קודמים"})` : "עוד אין היסטוריה לטעם הזה";
+  $("histBtn").disabled = !f.history.length; $("histBtn").style.opacity = f.history.length ? 1 : .55;
+  $("cups").textContent = f.cups;
+  // מה שונה מגרסה א
+  const base = f.versions[0], d = [];
+  if (S.version) {
+    const names = [...new Set([...v.ing, ...base.ing].map(i => i.name))];
+    for (const n of names) {
+      const a = (base.ing.find(i => i.name === n) || { g: 0 }).g, b = (v.ing.find(i => i.name === n) || { g: 0 }).g;
+      if (Math.abs(a - b) > 0.001) d.push(`${n} ${b > a ? "+" : "−"}${gfmt(Math.abs(b - a) * f.cups)}`);
+    }
+  }
+  $("diff").textContent = S.version ? (d.length ? "שונה מגרסה א: " + d.join(" · ") + " גרם" : "זהה לגרסה א כרגע") : "גרסה א היא נקודת ההשוואה";
+  // חומרי גלם
+  $("ings").innerHTML = "";
+  const t = total(v);
+  v.ing.forEach((ing, idx) => {
+    const a = (base.ing.find(i => i.name === ing.name) || { g: 0 }).g;
+    const row = document.createElement("div"); row.className = "ing" + (S.version && Math.abs(a - ing.g) > 0.001 ? " changed" : "");
+    const shown = ing.g * f.cups, p = price(ing.name), kgRow = ing.u === "kg";
+    row.innerHTML = `<div class="name"></div>
+      <div class="qty"><button data-d="-1" aria-label="פחות">−</button><input inputmode="decimal" aria-label="כמות"><button class="unit" aria-label="החלפה בין גרם לקילוגרם"></button><button data-d="1" aria-label="יותר">+</button></div>
+      <div class="sub"></div>`;
+    row.querySelector(".name").textContent = ing.name;
+    const sub = row.querySelector(".sub");
+    if (p == null) { sub.textContent = "אין מחיר במחירון"; sub.classList.add("warn"); }
+    else sub.textContent = `${t ? fmt(ing.g / t * 100, 1) : 0}% · ${fmt(p, 2)} ₪ לק״ג`;
+    const inp = row.querySelector("input"); inp.value = kgRow ? +(shown / 1000).toFixed(3) : +shown.toFixed(2);
+    const ub = row.querySelector(".unit"); ub.textContent = kgRow ? "ק״ג" : "גרם"; ub.classList.toggle("kg", kgRow);
+    ub.onclick = () => { ing.u = kgRow ? "g" : "kg"; save(); render(); };
+    const set = g => { ing.g = Math.max(0, g) / f.cups; save(); render(); };
+    inp.onchange = () => { const n = parseFloat(String(inp.value).replace(",", ".")); set(isFinite(n) ? n * (kgRow ? 1000 : 1) : 0); };
+    inp.onfocus = () => inp.select();
+    row.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => {
+      const stepG = kgRow ? (shown >= 1000 ? 100 : 10) : shown >= 5 ? 1 : 0.1;
+      const next = +(shown + stepG * b.dataset.d).toFixed(2);
+      if (next <= 0) { v.ing.splice(idx, 1); save(); render(); toast(ing.name + " הוסר מהגרסה"); } else set(next);
+    });
+    $("ings").append(row);
+  });
+  if (!v.ing.length) $("ings").innerHTML = '<div class="hint" style="text-align:center;padding:14px">אין חומרי גלם בגרסה. מוסיפים למטה.</div>';
+  // סיכום
+  const c = cost(v);
+  const all = t * f.cups;
+  $("sumG").textContent = all >= 1000 ? fmt(all / 1000, 2) : gfmt(+all.toFixed(1));
+  $("sumUnit").textContent = all >= 1000 ? "ק״ג" : "גרם";
+  $("sumCost").textContent = fmt(c.c, 2);
+  const notes = [];
+  if (Math.abs(t - SEED.unit) > 0.5) notes.push(`במתכון ${gfmt(+t.toFixed(1))} גרם ליח׳ מתוך ${SEED.unit}. ביחס הזה יח׳ מלאה תעלה ${fmt(c.full, 2)} ₪`);
+  if (c.missing.length) notes.push("בלי מחיר: " + c.missing.join(", ") + " (העלות חסרה)");
+  $("sumNote").hidden = !notes.length; $("sumNote").textContent = notes.join(" · ");
+  $("winBtn").textContent = f.winner === S.version ? "ממשיכים מהגרסה הזאת ←" : "★ זו הכי טעימה";
+}
+
+function openSheet(html) { $("sheet").innerHTML = html; $("scrim").hidden = false; }
+function closeSheet() { $("scrim").hidden = true; }
+$("scrim").onclick = e => { if (e.target === $("scrim")) closeSheet(); };
+
+$("nick").oninput = () => { ver().nick = $("nick").value; save(); };
+$("nick").onchange = render;
+$("note").oninput = () => { ver().note = $("note").value; save(); };
+
+$("histBtn").onclick = () => {
+  const f = cur(), dev = (f.stage || "dev") === "dev";
+  openSheet(`<h3>היסטוריה: ${S.flavor.replace(/[<&]/g, "")}</h3><div class="hint" style="margin-bottom:10px">הסבבים הקודמים, מהחדש לישן. הכמויות בגרם ליח׳ אחת.</div><div id="hlist"></div><button class="btn primary" id="hdone" style="width:100%">סגור</button>`);
+  [...f.history].reverse().forEach(hr => {
+    const box = document.createElement("div"); box.className = "hround";
+    const title = document.createElement("b");
+    title.textContent = (hr.stage === "cutter" ? "קאטר (לא אושר)" : hr.stage === "done" ? "קאטר, הטעם עבר" : "סבב " + hr.round) + (hr.at ? " · " + hr.at.split("-").reverse().join("/") : "");
+    box.append(title);
+    hr.versions.forEach((x, i) => {
+      const d = document.createElement("div"); d.className = "hver" + (hr.winner === i ? " win" : "");
+      d.innerHTML = '<div class="ht"><b></b><span></span><em></em></div>';
+      d.querySelector("b").textContent = hr.versions.length > 1 ? "גרסה " + LETTERS[i] : "המתכון";
+      d.querySelector("span").textContent = x.nick || "";
+      d.querySelector("em").textContent = fmt(cost(x).c, 2) + " ₪ · " + gfmt(+total(x).toFixed(1)) + " גרם";
+      if (x.note) { const n = document.createElement("div"); n.className = "hn"; n.textContent = "טעימה: " + x.note; d.append(n); }
+      const li = document.createElement("div"); li.className = "hi";
+      x.ing.forEach((g, k) => { if (k) li.append(" · "); li.append(g.name + " "); const s = document.createElement("i"); s.textContent = gfmt(+g.g.toFixed(2)); li.append(s); });
+      d.append(li);
+      if (dev) {
+        const b = document.createElement("button"); b.textContent = "העתק לגרסה " + LETTERS[S.version] + " שפתוחה עכשיו";
+        b.onclick = () => {
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "בטוח? זה יחליף את גרסה " + LETTERS[S.version]; b.style.borderColor = "var(--c-orange)"; b.style.color = "var(--c-orange)"; return; }
+          ver().ing = x.ing.map(y => ({ name: y.name, g: y.g })); save(); closeSheet(); render(); toast("הועתק מההיסטוריה לגרסה " + LETTERS[S.version]);
+        };
+        d.append(b);
+      }
+      box.append(d);
+    });
+    $("hlist").append(box);
+  });
+  $("hdone").onclick = closeSheet;
+};
+const cupStep = d => { const f = cur(), big = (f.stage || "dev") !== "dev" || f.cups >= 20; f.cups = Math.min(300, Math.max(1, f.cups + d * (big ? 5 : 1))); save(); render(); };
+$("cupMinus").onclick = () => cupStep(-1);
+$("cupPlus").onclick = () => cupStep(1);
+
+$("addBtn").onclick = () => {
+  openSheet(`<h3>איזה חומר גלם להוסיף?</h3><input class="search" id="q" placeholder="חיפוש"><div class="pick" id="pick"></div>
+    <div class="newmat"><h3>לא ברשימה? חומר גלם חדש</h3>
+      <input class="search" id="newName" maxlength="30" placeholder="שם חומר הגלם">
+      ${ME.role === "owner" ? '<input class="search" id="newPrice" inputmode="decimal" placeholder="מחיר לק״ג בשקלים (אפשר להשלים אחר כך)">' : '<div class="hint" style="margin:0 0 10px">את המחיר אריאל משלים במחירון.</div>'}
+      <button class="btn primary" id="newAdd" style="width:100%">הוסף לרשימה ולגרסה</button></div>`);
+  $("newAdd").onclick = () => {
+    const name = $("newName").value.trim();
+    if (!name) { toast("חסר שם לחומר הגלם"); return; }
+    if (mats().some(m => m.name === name)) { toast(name + " כבר ברשימה"); return; }
+    $("newAdd").disabled = true;
+    Backend.call("addMaterial", { name, price: $("newPrice") ? num($("newPrice").value) : null })
+      .then(r => { S.materials = r.materials; ver().ing.push({ name, g: 5 }); save(); closeSheet(); render(); toast(name + " נוסף, 5 גרם ליח׳. אפשר לשנות"); })
+      .catch(e => { $("newAdd").disabled = false; toast(e.message); });
+  };
+  const have = new Set(ver().ing.map(i => i.name));
+  const draw = () => {
+    const q = $("q").value.trim(); $("pick").innerHTML = "";
+    mats().filter(m => !have.has(m.name) && m.name.includes(q)).forEach(m => {
+      const b = document.createElement("button"); b.textContent = m.name;
+      b.onclick = () => { ver().ing.push({ name: m.name, g: 5 }); save(); closeSheet(); render(); toast(m.name + " נוסף, 5 גרם ליח׳. אפשר לשנות"); };
+      $("pick").append(b);
+    });
+  };
+  $("q").oninput = draw; draw();
+};
+
+$("pricesBtn").onclick = () => {
+  const owner = ME.role === "owner";
+  openSheet('<h3>מחירון חומרי גלם</h3><div class="hint" style="margin-bottom:10px">מחיר לק״ג בשקלים, לפני מע״מ. ' + (owner ? "שינוי כאן מעדכן מיד את העלות של כל הגרסאות." : "את המחירים אריאל מעדכן.") + '</div><div id="plist"></div><button class="btn primary" id="pdone" style="width:100%;margin-top:12px">סיימתי</button>');
+  const list = [...mats()].sort((a, b) => (a.price == null ? 0 : 1) - (b.price == null ? 0 : 1) || a.name.localeCompare(b.name, "he"));
+  for (const m of list) {
+    const row = document.createElement("label"); row.className = "prow" + (m.price == null ? " miss" : "");
+    row.innerHTML = '<span></span><input inputmode="decimal" placeholder="חסר"><small>₪/ק״ג</small>';
+    row.querySelector("span").textContent = m.name;
+    const inp = row.querySelector("input"); inp.value = m.price == null ? "" : m.price;
+    inp.onfocus = () => inp.select();
+    inp.disabled = !owner;
+    inp.onchange = () => {
+      const v = num(inp.value);
+      Backend.call("setPrice", { name: m.name, price: v })
+        .then(r => { S.materials = r.materials; row.classList.toggle("miss", v == null); render(); toast("המחיר של " + m.name + " עודכן"); })
+        .catch(e => { inp.value = m.price == null ? "" : m.price; toast(e.message); });
+    };
+    $("plist").append(row);
+  }
+  $("pdone").onclick = closeSheet;
+};
+
+function newFlavor() {
+  openSheet(`<h3>טעם חדש</h3>
+    <input class="search" id="fName" maxlength="30" placeholder="שם הטעם">
+    <div class="hint" style="margin-bottom:8px">ממה מתחילים?</div><div class="pick" id="pick"></div>`);
+  const start = (label, ing) => {
+    const b = document.createElement("button"); b.textContent = label;
+    b.onclick = () => {
+      const name = $("fName").value.trim();
+      if (!name) { toast("חסר שם לטעם"); $("fName").focus(); return; }
+      if (S.flavors[name]) { toast("כבר יש טעם בשם הזה"); return; }
+      const nf = { rev: 1, round: 1, cups: 1, stage: "dev", winner: null, history: [],
+        versions: LETTERS.map((_, i) => ({ nick: i ? "" : "גרסה ראשונה", ing: ing.map(y => ({ name: y.name, g: y.g })) })) };
+      b.disabled = true;
+      Backend.call("createFlavor", { name, state: stateOf(nf) })
+        .then(r => { nf.rev = r.rev; S.flavors[name] = nf; synced[name] = JSON.stringify(stateOf(nf)); S.flavor = name; S.version = 0; save(); closeSheet(); render(); toast(name + " נפתח. מוסיפים חומרי גלם למטה"); })
+        .catch(e => { b.disabled = false; toast(e.message); });
+    };
+    $("pick").append(b);
+  };
+  start("מתכון ריק", []);
+  for (const [n, f] of Object.entries(S.flavors)) start("העתק מ" + n, (f.versions[f.winner == null ? 0 : f.winner]).ing);
+}
+
+$("copyBtn").onclick = () => {
+  const f = cur();
+  openSheet(`<h3>להעתיק לגרסה ${LETTERS[S.version]} מתכון של גרסה אחרת?</h3><div class="hint" style="margin-bottom:10px">מה שיש עכשיו בגרסה ${LETTERS[S.version]} יוחלף.</div><div class="pick" id="pick"></div>`);
+  f.versions.forEach((x, i) => {
+    if (i === S.version) return;
+    const b = document.createElement("button"); b.textContent = "גרסה " + LETTERS[i] + (x.nick ? " · " + x.nick : "");
+    b.onclick = () => { ver().ing = x.ing.map(y => ({ ...y })); save(); closeSheet(); render(); toast("הועתק מגרסה " + LETTERS[i]); };
+    $("pick").append(b);
+  });
+};
+
+$("winBtn").onclick = () => {
+  const f = cur();
+  if (f.winner !== S.version) { f.winner = S.version; save(); render(); toast("גרסה " + LETTERS[S.version] + " סומנה כהכי טעימה"); return; }
+  openSheet(`<h3>גרסה ${LETTERS[S.version]} נבחרה. מה עכשיו?</h3>
+    <div class="hint" style="margin-bottom:12px"><b>לשפר עוד:</b> גרסה ${LETTERS[S.version]} הופכת לבסיס (גרסה א) של סבב ${f.round + 1}, וגרסאות ב ו-ג מתחילות כהעתק שלה לשינויים.<br><b>לקאטר:</b> הטעם מוכן, ומכינים ממנו כמות של קאטר (${SEED.cutter || 70} יח׳) כדי לבדוק שהוא נשמר.<br>שלוש הגרסאות של סבב ${f.round} נשמרות בהיסטוריה.</div>
+    <div class="row-btns"><button class="btn primary" id="yes">לשפר עוד</button><button class="btn gold" id="cut">עוברים לקאטר</button></div>
+    <div class="row-btns"><button class="btn" id="no">לא עכשיו</button></div>`);
+  $("no").onclick = closeSheet;
+  $("cut").onclick = () => {
+    const w = f.versions[f.winner];
+    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions });
+    f.cups = SEED.cutter || 70;
+    f.versions = [{ nick: w.nick, ing: w.ing.map(y => ({ ...y, u: y.g * f.cups >= 1000 ? "kg" : "g" })) }];
+    f.stage = "cutter"; f.winner = null; S.version = 0; save(); closeSheet(); render(); toast("שלב הקאטר: " + f.cups + " יח׳");
+  };
+  $("yes").onclick = () => {
+    const w = f.versions[f.winner];
+    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions });
+    f.versions = LETTERS.map((_, i) => ({ nick: i ? "" : (w.nick || "הנבחרת מסבב " + f.round), ing: w.ing.map(y => ({ ...y })) }));
+    f.round++; f.winner = null; S.version = 0; save(); closeSheet(); render(); toast("סבב " + f.round + " התחיל");
+  };
+};
+
+function take(d) {
+  let ui = {}; try { ui = JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch (e) {}
+  const keep = S ? { flavor: S.flavor, version: S.version } : ui;
+  ME = d.user; SEED = { unit: d.unit, cutter: d.cutter };
+  const names = Object.keys(d.flavors);
+  for (const n of names) { adopt(d.flavors[n]); synced[n] = JSON.stringify(stateOf(d.flavors[n])); }
+  if (!names.length) { document.querySelector("main").innerHTML = '<div class="card">עוד אין טעמים במערכת.</div>'; return; }
+  S = { materials: d.materials, flavors: d.flavors, flavor: d.flavors[keep.flavor] ? keep.flavor : names[0], version: 0 };
+  S.version = Math.min(keep.version || 0, cur().versions.length - 1);
+  render(); showSync();
+}
+function reload(quiet) {
+  return Backend.call("load").then(take).catch(e => { if (!quiet) document.querySelector("main").innerHTML = '<div class="card">' + e.message.replace(/[<&]/g, "") + '</div>'; });
+}
+/* כשחוזרים למסך: טוענים מחדש, אבל רק אם אין שינוי שעוד לא נשמר ואין חלון פתוח */
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible" || !S) return;
+  if (Object.keys(S.flavors).some(n => busy[n] || timers[n] || dirty(n)) || !$("scrim").hidden || document.activeElement.tagName === "INPUT") return;
+  reload(true);
+});
+$("sync").textContent = "טוען…";
+(window.MockBackend ? MockBackend.ready : Promise.resolve()).then(() => reload(false));
+</script>
+</body>
+</html>
