@@ -111,6 +111,17 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 .sheet input.search { width: 100%; height: 48px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; margin-bottom: 10px; background: #fff; }
 .newmat { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
 .hbtn { height: 36px; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: 14px; color: var(--accent); }
+#undoBtn { padding: 0 10px; white-space: nowrap; }
+/* בטלפון צר: הכותרת מתכווצת כדי שכפתור הביטול ייכנס בלי גלילה לרוחב */
+@media (max-width: 420px) {
+  header.top { gap: 6px; }
+  header.top img { height: 24px; }
+  header.top .t { font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  header.top .hbtn { padding: 0 9px; font-size: 13px; }
+}
+#undoBtn:disabled { opacity: .35; }
+.add.del { background: transparent; border-color: var(--line); color: var(--muted); font-size: 14px; margin-top: 18px; }
+.add.del.sure { background: #c62828; border-color: #c62828; color: #fff; }
 .prow { display: grid; grid-template-columns: 1fr 96px auto; align-items: center; gap: 8px; background: var(--surface); border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; box-shadow: var(--shadow-sm); font-weight: 600; }
 .prow input { height: 44px; text-align: center; border: 1.5px solid var(--line); border-radius: 10px; font-weight: 800; font-size: 17px; direction: ltr; background: #fff; width: 100%; }
 .prow small { color: var(--muted); font-size: 12.5px; }
@@ -141,6 +152,7 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 <header class="top">
   <img src="data:image/png;base64,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" alt="MOZ">
   <div class="t">פיתוח טעמים<small id="sync"></small></div>
+  <button class="hbtn" id="undoBtn" aria-label="ביטול השינוי האחרון" disabled>↶ בטל</button>
   <button class="hbtn" id="pricesBtn">מחירון</button>
   <div class="round" id="round"></div>
 </header>
@@ -182,6 +194,7 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
     </div>
   </div>
   <button class="add" id="histBtn" style="background:var(--surface)"></button>
+  <button class="add del" id="delBtn" hidden></button>
 </main>
 
 <div class="sum"><div class="in">
@@ -243,7 +256,7 @@ function push(name) {
     .then(r => {
       busy[name] = false; failed = false;
       if (r.conflict) {
-        S.flavors[name] = adopt(r.flavor); synced[name] = JSON.stringify(stateOf(S.flavors[name]));
+        S.flavors[name] = adopt(r.flavor); synced[name] = lastSnap[name] = JSON.stringify(stateOf(S.flavors[name]));
         if (S.flavor === name) { S.version = Math.min(S.version, S.flavors[name].versions.length - 1); closeSheet(); render(); }
         toast("מישהו אחר שינה את " + name + ". נטען המצב העדכני");
       } else {
@@ -263,7 +276,34 @@ const mats = () => S.materials;
 const price = name => (mats().find(m => m.name === name) || {}).price;
 const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) && n >= 0 ? n : null; };
 /* נקרא אחרי כל שינוי: זוכר מה פתוח במסך, ושולח לשרת כל טעם שהשתנה, אחרי שנייה של שקט */
+/* ביטול ("↶ בטל"): לכל טעם נשמרים עד 40 מצבים קודמים, בדפדפן הזה (נשארים גם אחרי רענון).
+   שינויים רצופים בתוך שנייה וחצי נחשבים צעד אחד. */
+const UNDOKEY = "moz-recipe-lab-undo";
+let undo = {}; try { undo = JSON.parse(localStorage.getItem(UNDOKEY)) || {}; } catch (e) {}
+const lastSnap = {}, lastAt = {};
+function track() {
+  for (const n of Object.keys(S.flavors)) {
+    const now = JSON.stringify(stateOf(S.flavors[n]));
+    if (lastSnap[n] == null) { lastSnap[n] = now; continue; }
+    if (now === lastSnap[n]) continue;
+    const st = undo[n] = undo[n] || [];
+    if (!(Date.now() - (lastAt[n] || 0) < 1500 && st.length)) { st.push(lastSnap[n]); if (st.length > 40) st.shift(); }
+    lastAt[n] = Date.now(); lastSnap[n] = now;
+  }
+  try { localStorage.setItem(UNDOKEY, JSON.stringify(undo)); } catch (e) {}
+  showUndo();
+}
+function showUndo() { $("undoBtn").disabled = !S || !(undo[S.flavor] || []).length; }
+$("undoBtn").onclick = () => {
+  const n = S.flavor, st = (undo[n] || []).pop(); if (!st) return;
+  const f = cur(), s = JSON.parse(st);
+  Object.assign(f, { round: s.round, cups: s.cups, stage: s.stage, winner: s.winner, doneAt: s.doneAt, versions: s.versions });
+  lastSnap[n] = st; lastAt[n] = 0;
+  S.version = Math.min(S.version, f.versions.length - 1);
+  closeSheet(); save(); render(); toast("השינוי האחרון בוטל");
+};
 const save = () => {
+  track();
   try { localStorage.setItem(UIKEY, JSON.stringify({ flavor: S.flavor, version: S.version })); } catch (e) {}
   for (const n of Object.keys(S.flavors)) if (dirty(n)) schedule(n, 900);
 };
@@ -283,6 +323,8 @@ function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false
 
 function render() {
   const f = cur(), v = ver();
+  showUndo();
+  const del = $("delBtn"); del.hidden = !(ME && ME.role === "owner"); del.classList.remove("sure"); del.textContent = "מחיקת הטעם " + S.flavor;
   const stage = f.stage || "dev", dev = stage === "dev";
   $("round").textContent = dev ? "סבב " + f.round : stage === "cutter" ? "קאטר" : "עבר בקאטר";
   const tw = total(v) * f.cups;
@@ -503,6 +545,25 @@ function newFlavor() {
   for (const [n, f] of Object.entries(S.flavors)) start("העתק מ" + n, (f.versions[f.winner == null ? 0 : f.winner]).ing);
 }
 
+/* מחיקת טעם (בעלים בלבד): לחיצה ראשונה מבקשת אישור, השנייה מוחקת. בגיליון הטעם נשאר, מסומן "נמחק". */
+$("delBtn").onclick = () => {
+  const b = $("delBtn"), n = S.flavor;
+  if (!b.classList.contains("sure")) {
+    b.classList.add("sure"); b.textContent = "בטוח? " + n + " יימחק מהרשימה. לחיצה נוספת";
+    setTimeout(() => { if (b.classList.contains("sure") && S.flavor === n) { b.classList.remove("sure"); b.textContent = "מחיקת הטעם " + n; } }, 5000);
+    return;
+  }
+  b.disabled = true; clearTimeout(timers[n]); timers[n] = null;
+  Backend.call("deleteFlavor", { name: n }).then(() => {
+    b.disabled = false;
+    delete S.flavors[n]; delete synced[n]; delete undo[n]; delete lastSnap[n];
+    try { localStorage.setItem(UNDOKEY, JSON.stringify(undo)); } catch (e) {}
+    const names = Object.keys(S.flavors);
+    if (!names.length) { document.querySelector("main").innerHTML = '<div class="card">עוד אין טעמים במערכת.</div>'; return; }
+    S.flavor = names[0]; S.version = 0; save(); render(); showSync(); toast(n + " נמחק");
+  }).catch(e => { b.disabled = false; toast(e.message); render(); });
+};
+
 $("copyBtn").onclick = () => {
   const f = cur();
   openSheet(`<h3>להעתיק לגרסה ${LETTERS[S.version]} מתכון של גרסה אחרת?</h3><div class="hint" style="margin-bottom:10px">מה שיש עכשיו בגרסה ${LETTERS[S.version]} יוחלף.</div><div class="pick" id="pick"></div>`);
@@ -542,7 +603,7 @@ function take(d) {
   const keep = S ? { flavor: S.flavor, version: S.version } : ui;
   ME = d.user; SEED = { unit: d.unit, cutter: d.cutter };
   const names = Object.keys(d.flavors);
-  for (const n of names) { adopt(d.flavors[n]); synced[n] = JSON.stringify(stateOf(d.flavors[n])); }
+  for (const n of names) { adopt(d.flavors[n]); synced[n] = lastSnap[n] = JSON.stringify(stateOf(d.flavors[n])); }
   if (!names.length) { document.querySelector("main").innerHTML = '<div class="card">עוד אין טעמים במערכת.</div>'; return; }
   S = { materials: d.materials, flavors: d.flavors, flavor: d.flavors[keep.flavor] ? keep.flavor : names[0], version: 0 };
   S.version = Math.min(keep.version || 0, cur().versions.length - 1);
