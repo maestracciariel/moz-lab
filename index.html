@@ -98,6 +98,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 .sum .k { color: var(--muted); font-size: 13px; }
 .sum .v { font-weight: 800; font-size: 22px; color: var(--accent-strong); }
 .sum .v small { font-size: 14px; font-weight: 600; color: var(--muted); }
+.sum .s { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.sum .s:empty { display: none; }
 .sum .note { grid-column: 1 / -1; font-size: 13.5px; color: var(--c-orange); font-weight: 600; }
 
 /* חלון תחתון */
@@ -183,8 +185,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 </main>
 
 <div class="sum"><div class="in">
-  <div><div class="k">סה״כ בקערה</div><div class="v"><span id="sumG"></span> <small id="sumUnit">גרם</small></div></div>
-  <div><div class="k">עלות חומרי גלם ליח׳</div><div class="v"><span id="sumCost"></span> <small>₪</small></div></div>
+  <div><div class="k">סה״כ בקערה</div><div class="v"><span id="sumG"></span> <small id="sumUnit">גרם</small></div><div class="s" id="sumGs"></div></div>
+  <div><div class="k">עלות חומרי גלם ליח׳</div><div class="v"><span id="sumCost"></span> <small>₪</small></div><div class="s" id="sumCs"></div></div>
   <div class="note" id="sumNote" hidden></div>
 </div></div>
 
@@ -375,6 +377,9 @@ function render() {
   $("sumG").textContent = all >= 1000 ? fmt(all / 1000, 2) : gfmt(+all.toFixed(1));
   $("sumUnit").textContent = all >= 1000 ? "ק״ג" : "גרם";
   $("sumCost").textContent = fmt(c.c, 2);
+  // כשמכינים יותר מיח׳ אחת: הכמויות במסך הן לכל הקערה, והעלות ליח׳. מציגים את שניהם כדי שלא יתבלבלו
+  $("sumGs").textContent = f.cups > 1 ? `${f.cups} יח׳ × ${gfmt(+t.toFixed(1))} גרם` : "";
+  $("sumCs").textContent = f.cups > 1 ? `כל הקערה (${f.cups} יח׳): ${fmt(c.c * f.cups, 2)} ₪` : "";
   const notes = [];
   if (Math.abs(t - SEED.unit) > 0.5) notes.push(`במתכון ${gfmt(+t.toFixed(1))} גרם ליח׳ מתוך ${SEED.unit}. ביחס הזה יח׳ מלאה תעלה ${fmt(c.full, 2)} ₪`);
   if (c.missing.length) notes.push("בלי מחיר: " + c.missing.join(", ") + " (העלות חסרה)");
