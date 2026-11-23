@@ -81,6 +81,9 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 .ing .qty input { width: 82px; height: 48px; text-align: center; border: 1.5px solid var(--line); border-radius: 12px; font-size: 20px; font-weight: 800; background: #fff; direction: ltr; }
 .ing .qty small { color: var(--muted); font-size: 13px; width: 22px; }
 .changed .qty input { border-color: var(--gold); background: #fffaea; }
+/* לעומת גרסה א: ירוק = עלה, אדום = ירד */
+.changed.up .qty input { border-color: #2e7d32; background: #e8f5e9; color: #1b5e20; }
+.changed.down .qty input { border-color: #c62828; background: #fdecea; color: #b71c1c; }
 .add { width: 100%; height: 50px; margin-top: 10px; border-radius: 12px; border: 1.5px dashed var(--accent-mid); background: none; color: var(--accent); font-weight: 700; }
 .row-btns { display: flex; gap: 8px; margin-top: 12px; }
 .btn { flex: 1; height: 48px; border-radius: 12px; border: 0; background: var(--surface-2); font-weight: 700; font-size: 15.5px; }
@@ -336,7 +339,7 @@ function render() {
   const t = total(v);
   v.ing.forEach((ing, idx) => {
     const a = (base.ing.find(i => i.name === ing.name) || { g: 0 }).g;
-    const row = document.createElement("div"); row.className = "ing" + (S.version && Math.abs(a - ing.g) > 0.001 ? " changed" : "");
+    const row = document.createElement("div"); row.className = "ing" + (S.version && Math.abs(a - ing.g) > 0.001 ? " changed " + (ing.g > a ? "up" : "down") : "");
     const shown = ing.g * f.cups, p = price(ing.name), kgRow = ing.u === "kg";
     row.innerHTML = `<div class="name"></div>
       <div class="qty"><button data-d="-1" aria-label="פחות">−</button><input inputmode="decimal" aria-label="כמות"><button class="unit" aria-label="החלפה בין גרם לקילוגרם"></button><button data-d="1" aria-label="יותר">+</button></div>
