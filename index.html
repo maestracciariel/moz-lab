@@ -177,6 +177,8 @@ body.plan .sum, body.plan #undoBtn, body.plan #round { display: none !important;
 .pitem.done .pchk { background: var(--k); color: #fff; } .pitem.k-taste.done .pchk { color: #4d4d4d; }
 .pitem.done b { text-decoration: line-through; color: var(--muted); }
 .pitem.late { box-shadow: 0 0 0 2px #b13943; }
+.pdel { flex: none; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.7); color: var(--muted); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.pdel.sure { background: #b13943; border-color: #b13943; color: #fff; }
 .mgrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .mgrid .dow { text-align: center; font-size: 12px; color: var(--muted); font-weight: 700; }
 .mday { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-height: 66px; padding: 4px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); text-align: start; min-width: 0; }
@@ -697,7 +699,8 @@ function itemHtml(it) {
   const k = KIND[it.kind] || "other";
   return `<div class="pitem k-${k}${it.done ? " done" : ""}${late(it) ? " late" : ""}" data-pid="${esc(it.id)}">
     <button type="button" class="pchk" data-done="${esc(it.id)}" aria-label="סימון בוצע">${it.done ? "✓" : ""}</button>
-    <div class="pt"><b>${esc(it.flavor)}</b><span>${esc(it.kind)}${it.note ? " · " + esc(it.note) : ""}</span></div></div>`;
+    <div class="pt"><b>${esc(it.flavor)}</b><span>${esc(it.kind)}${it.note ? " · " + esc(it.note) : ""}</span></div>
+    <button type="button" class="pdel" data-pdel="${esc(it.id)}" aria-label="הורדה מהלו״ז">✕</button></div>`;
 }
 
 function renderPlan() {
@@ -808,11 +811,27 @@ function togglePlanDone(id) {
     .catch(e => { it.done = !it.done; renderPlan(); toast(e.message); });
 }
 
+/* הורדה מהלו"ז ישר מהרשימה: לחיצה ראשונה שואלת, השנייה מורידה. בגיליון השורה נשארת, מסומנת "נמחק". */
+function removePlan(b) {
+  if (!b.classList.contains("sure")) {
+    b.classList.add("sure"); b.textContent = "להוריד?";
+    setTimeout(() => { if (b.isConnected && b.classList.contains("sure")) { b.classList.remove("sure"); b.textContent = "✕"; } }, 4000);
+    return;
+  }
+  const id = b.dataset.pdel, it = (S.plan || []).find(x => x.id === id), dayOpen = !$("scrim").hidden;
+  b.disabled = true;
+  Backend.call("deletePlan", { id }).then(r => {
+    S.plan = r.plan; renderPlan(); if (dayOpen && it) openPlanDay(it.date);
+    toast((it ? it.flavor : "") + " ירד מהלו״ז");
+  }).catch(e => { b.disabled = false; toast(e.message); });
+}
+
 /* לחיצות בתוך הלו"ז ובחלון של יום */
 function planClick(e) {
   const t = e.target;
   let b;
   if ((b = t.closest("[data-done]"))) { togglePlanDone(b.dataset.done); return; }
+  if ((b = t.closest("[data-pdel]"))) { removePlan(b); return; }
   if ((b = t.closest("[data-add]"))) { openPlanItem(null, b.dataset.add); return; }
   if ((b = t.closest("[data-pid]"))) { const it = (S.plan || []).find(x => x.id === b.dataset.pid); if (it) openPlanItem(it); return; }
   if ((b = t.closest("[data-day]"))) { openPlanDay(b.dataset.day); return; }
