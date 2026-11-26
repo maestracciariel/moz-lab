@@ -58,6 +58,11 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 .nick { display: flex; gap: 8px; align-items: center; }
 .nick input { flex: 1; min-width: 0; height: 46px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; background: var(--surface-2); font-weight: 600; }
 .hint { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.taste .tl { display: block; font-size: 14px; font-weight: 700; color: var(--accent); margin: 0 2px 6px; }
+.taste .tl + textarea + .tl { margin-top: 12px; }
+.taste textarea { display: block; width: 100%; box-sizing: border-box; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); font: inherit; font-weight: 600; resize: vertical; }
+.taste #concl { background: #fff8e3; }
+.hround .hc { background: #fff8e3; border-radius: 10px; padding: 8px 10px; margin: 0 0 8px; font-size: 14.5px; font-weight: 600; }
 
 /* כמה מכינים */
 .batch { display: flex; align-items: center; gap: 10px; }
@@ -234,15 +239,19 @@ body.plan .sum, body.plan #undoBtn, body.plan #round { display: none !important;
     <div class="hint" id="diff"></div>
   </div>
 
+  <div class="card taste" id="noteCard">
+    <label class="tl" for="note" id="noteLabel">טעימה של גרסה א</label>
+    <textarea id="note" maxlength="140" rows="2" placeholder="איך יצאה הגרסה הזאת? למשל: מתוקה מדי, חסר חמיצות"></textarea>
+    <label class="tl" for="concl" id="conclLabel">מסקנת הסבב</label>
+    <textarea id="concl" maxlength="400" rows="3" placeholder="מה החלטנו אחרי הטעימה? למשל: ב הכי טובה, בסבב הבא פחות תמר ויותר לימון"></textarea>
+    <div class="hint">נשמר לבד. כשבוחרים "★ זו הכי טעימה" וממשיכים, הטעימות והמסקנה נשמרות בהיסטוריה של הסבב.</div>
+  </div>
+
   <div class="card">
     <div class="batch">
       <div class="grow">כמה יח׳ מכינים?<div class="hint" style="margin:0" id="unitHint">יח׳ = <span id="unitG"></span> גרם</div><div class="bigw" id="bigW" hidden></div></div>
       <div class="step"><button id="cupMinus" aria-label="פחות">−</button><output id="cups"></output><button id="cupPlus" aria-label="יותר">+</button></div>
     </div>
-  </div>
-
-  <div class="card" id="noteCard">
-    <div class="nick"><input id="note" maxlength="140" placeholder="איך יצא בטעימה? למשל: מתוק מדי" aria-label="הערת טעימה"></div>
   </div>
 
   <div class="card" id="ingCard">
@@ -306,7 +315,7 @@ const Backend = window.MockBackend || (API ? {
     .api(BOOT.k, action, payload))
 });
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
-const stateOf = f => ({ round: f.round, cups: f.cups, stage: f.stage || "dev", winner: f.winner == null ? null : f.winner, doneAt: f.doneAt || "", versions: f.versions });
+const stateOf = f => ({ round: f.round, cups: f.cups, stage: f.stage || "dev", winner: f.winner == null ? null : f.winner, doneAt: f.doneAt || "", versions: f.versions, concl: f.concl || "" });
 const synced = {}, timers = {}, busy = {};
 let failed = false;
 function showSync() {
@@ -321,7 +330,7 @@ function push(name) {
   if (!f || busy[name] || !dirty(name)) { showSync(); return; }
   busy[name] = true; showSync();
   const state = stateOf(f), snap = JSON.stringify(state), hist = f.history.filter(h => !h.saved);
-  Backend.call("saveFlavor", { name, state, rev: f.rev, history: hist.map(h => ({ hid: h.hid, round: h.round, stage: h.stage || "dev", at: h.at, winner: h.winner, versions: h.versions })) })
+  Backend.call("saveFlavor", { name, state, rev: f.rev, history: hist.map(h => ({ hid: h.hid, round: h.round, stage: h.stage || "dev", at: h.at, winner: h.winner, versions: h.versions, concl: h.concl || "" })) })
     .then(r => {
       busy[name] = false; failed = false;
       if (r.conflict) {
@@ -366,7 +375,7 @@ function showUndo() { $("undoBtn").disabled = !S || !(undo[S.flavor] || []).leng
 $("undoBtn").onclick = () => {
   const n = S.flavor, st = (undo[n] || []).pop(); if (!st) return;
   const f = cur(), s = JSON.parse(st);
-  Object.assign(f, { round: s.round, cups: s.cups, stage: s.stage, winner: s.winner, doneAt: s.doneAt, versions: s.versions });
+  Object.assign(f, { round: s.round, cups: s.cups, stage: s.stage, winner: s.winner, doneAt: s.doneAt, versions: s.versions, concl: s.concl || "" });
   lastSnap[n] = st; lastAt[n] = 0;
   S.version = Math.min(S.version, f.versions.length - 1);
   closeSheet(); save(); render(); toast("השינוי האחרון בוטל");
@@ -410,7 +419,7 @@ function render() {
     if ($("cutOk")) $("cutOk").onclick = () => { f.stage = "done"; f.doneAt = new Date().toISOString().slice(0, 10); save(); render(); toast("נרשם: הטעם עבר בקאטר"); };
     $("cutBack").onclick = () => {
       const w = f.versions[0];
-      f.history.push({ hid: uid(), at: today(), round: f.round, stage, versions: f.versions });
+      f.history.push({ hid: uid(), at: today(), round: f.round, stage, versions: f.versions, concl: f.concl || "" }); f.concl = "";
       f.versions = LETTERS.map((_, i) => ({ nick: i ? "" : "אחרי קאטר", ing: w.ing.map(y => ({ ...y })) }));
       f.stage = "dev"; f.round++; f.winner = null; f.cups = 1; S.version = 0; save(); render(); toast("חזרנו לשיפור, סבב " + f.round);
     };
@@ -434,6 +443,9 @@ function render() {
   });
   $("nick").value = v.nick;
   $("note").value = v.note || "";
+  $("noteLabel").textContent = dev ? "טעימה של גרסה " + LETTERS[S.version] : "איך יצא בקאטר";
+  $("conclLabel").textContent = dev ? "מסקנת סבב " + f.round + " (על כל הגרסאות)" : "מסקנת הקאטר";
+  $("concl").value = f.concl || "";
   $("histBtn").textContent = f.history.length ? `היסטוריה של ${S.flavor} (${f.history.length} ${f.history.length === 1 ? "סבב קודם" : "סבבים קודמים"})` : "עוד אין היסטוריה לטעם הזה";
   $("histBtn").disabled = !f.history.length; $("histBtn").style.opacity = f.history.length ? 1 : .55;
   $("cups").textContent = f.cups;
@@ -505,6 +517,7 @@ $("scrim").onclick = e => { if (e.target === $("scrim")) closeSheet(); };
 $("nick").oninput = () => { ver().nick = $("nick").value; save(); };
 $("nick").onchange = render;
 $("note").oninput = () => { ver().note = $("note").value; save(); };
+$("concl").oninput = () => { cur().concl = $("concl").value; save(); };
 
 $("histBtn").onclick = () => {
   const f = cur(), dev = (f.stage || "dev") === "dev";
@@ -514,6 +527,7 @@ $("histBtn").onclick = () => {
     const title = document.createElement("b");
     title.textContent = (hr.stage === "cutter" ? "קאטר (לא אושר)" : hr.stage === "done" ? "קאטר, הטעם עבר" : "סבב " + hr.round) + (hr.at ? " · " + hr.at.split("-").reverse().join("/") : "");
     box.append(title);
+    if (hr.concl) { const c = document.createElement("div"); c.className = "hc"; c.textContent = "מסקנה: " + hr.concl; box.append(c); }
     hr.versions.forEach((x, i) => {
       const d = document.createElement("div"); d.className = "hver" + (hr.winner === i ? " win" : "");
       d.innerHTML = '<div class="ht"><b></b><span></span><em></em></div>';
@@ -654,14 +668,14 @@ $("winBtn").onclick = () => {
   $("no").onclick = closeSheet;
   $("cut").onclick = () => {
     const w = f.versions[f.winner];
-    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions });
+    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions, concl: f.concl || "" }); f.concl = "";
     f.cups = SEED.cutter || 70;
     f.versions = [{ nick: w.nick, ing: w.ing.map(y => ({ ...y, u: y.g * f.cups >= 1000 ? "kg" : "g" })) }];
     f.stage = "cutter"; f.winner = null; S.version = 0; save(); closeSheet(); render(); toast("שלב הקאטר: " + f.cups + " יח׳");
   };
   $("yes").onclick = () => {
     const w = f.versions[f.winner];
-    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions });
+    f.history.push({ hid: uid(), at: today(), round: f.round, winner: f.winner, versions: f.versions, concl: f.concl || "" }); f.concl = "";
     f.versions = LETTERS.map((_, i) => ({ nick: i ? "" : (w.nick || "הנבחרת מסבב " + f.round), ing: w.ing.map(y => ({ ...y })) }));
     f.round++; f.winner = null; S.version = 0; save(); closeSheet(); render(); toast("סבב " + f.round + " התחיל");
   };
