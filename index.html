@@ -146,6 +146,63 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
 .st-t { font-weight: 800; font-size: 19px; color: var(--accent-strong); }
 .flavors button .tag { font-size: 12px; font-weight: 700; opacity: .8; margin-inline-start: 6px; }
 .toast { position: fixed; top: 76px; inset-inline: 0; margin: auto; width: max-content; max-width: 90vw; background: var(--accent-strong); color: #fff; padding: 10px 16px; border-radius: 999px; font-weight: 600; z-index: 60; box-shadow: var(--shadow-lg); }
+
+/* ===== לו"ז: מה מכינים מתי (תצוגה שבועית וחודשית, כמו במערכת ההזמנות) ===== */
+.vtabs { display: flex; gap: 6px; max-width: 640px; margin: 10px auto 0; padding: 0 14px; }
+.vtabs button { flex: 1; height: 44px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; color: var(--accent); }
+.vtabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+body.plan .sum, body.plan #undoBtn, body.plan #round { display: none !important; }
+#planMain { max-width: 1100px; margin: 0 auto; padding: 12px 14px 60px; }
+.pseg { display: flex; gap: 6px; margin-bottom: 10px; }
+.pseg button { height: 40px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; }
+.pseg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent-strong); }
+.pseg .padd-top { margin-inline-start: auto; background: var(--accent); border-color: var(--accent); color: #fff; }
+.caltools { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.caltools strong { flex: 1; text-align: center; font-size: 15.5px; white-space: nowrap; }
+.caltools button { height: 40px; padding: 0 10px; border-radius: 10px; border: 0; background: var(--surface); box-shadow: var(--shadow-sm); font-weight: 600; font-size: 14px; white-space: nowrap; }
+.pwarn { background: #fbe3e2; color: #b13943; border-radius: 12px; padding: 10px 12px; font-weight: 600; font-size: 14.5px; margin-bottom: 10px; }
+.k-dev { --k: #506954; --k-bg: #e2fbeb; } .k-taste { --k: #d3b254; --k-bg: #f9ebd1; } .k-cut { --k: #61362f; --k-bg: #f0d6dc; } .k-other { --k: #7a7a7a; --k-bg: #f2f5ef; }
+.wk { display: grid; gap: 8px; }
+@media (min-width: 900px) { .wk { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+.pday { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); padding: 8px 10px; min-width: 0; }
+.pday.today { box-shadow: var(--shadow-sm), inset -4px 0 0 var(--accent); background: #fbfffc; }
+.pdh { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); }
+.pdh b { color: var(--ink); } .pdh .sp { flex: 1; }
+.padd { width: 36px; height: 36px; flex: none; border-radius: 999px; border: 1.5px dashed var(--accent-mid); background: transparent; color: var(--accent); font-size: 20px; font-weight: 700; line-height: 1; }
+.pitem { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 6px 8px; border-radius: 10px; background: var(--k-bg); border-inline-start: 4px solid var(--k); cursor: pointer; min-width: 0; }
+.pitem .pt { flex: 1; min-width: 0; }
+.pitem b { display: block; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pitem span { display: block; font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pchk { flex: none; width: 34px; height: 34px; border-radius: 999px; border: 2px solid var(--k); background: #fff; color: var(--k); font-weight: 800; }
+.pitem.done .pchk { background: var(--k); color: #fff; } .pitem.k-taste.done .pchk { color: #4d4d4d; }
+.pitem.done b { text-decoration: line-through; color: var(--muted); }
+.pitem.late { box-shadow: 0 0 0 2px #b13943; }
+.mgrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.mgrid .dow { text-align: center; font-size: 12px; color: var(--muted); font-weight: 700; }
+.mday { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-height: 66px; padding: 4px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); text-align: start; min-width: 0; }
+.mday.out { opacity: .4; } .mday.today { border-color: var(--accent); background: var(--accent-soft); }
+.mday .n { font-size: 12px; font-weight: 700; }
+.mi { display: block; font-size: 10.5px; line-height: 1.35; padding: 1px 3px; border-radius: 4px; background: var(--k-bg); color: #4d4d4d; border-inline-start: 3px solid var(--k); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mi.done { opacity: .5; text-decoration: line-through; } .mi.late { background: #fbe3e2; }
+.mmore { font-size: 10.5px; color: var(--muted); }
+@media (min-width: 760px) { .mday { min-height: 104px; } .mi { font-size: 12.5px; } }
+.plegend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; color: var(--muted); margin: 10px 2px 0; }
+.plegend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--k); margin-inline-end: 4px; vertical-align: -1px; }
+.prog .pr { padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.prog .pr:last-child { border-bottom: 0; }
+@media (min-width: 900px) { .prog { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; } .prog .pr:nth-last-child(2):nth-child(odd) { border-bottom: 0; } }
+.pr .top { display: flex; gap: 8px; align-items: center; } .pr .top b { flex: 1; min-width: 0; }
+.stg { font-size: 12.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); white-space: nowrap; }
+.stg.ok { background: #506954; color: #fff; } .stg.gone { background: var(--surface-2); color: var(--muted); }
+.bar { height: 8px; border-radius: 999px; background: var(--surface-2); margin: 6px 0 4px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--accent); }
+.pr .nx { font-size: 13.5px; color: var(--muted); } .pr .nx.warn { color: #b13943; font-weight: 600; }
+.sheet .fld { display: block; font-size: 13px; color: var(--muted); font-weight: 700; margin: 10px 2px 4px; }
+.sheet input[type="date"], .sheet select, .sheet input.txt { width: 100%; height: 48px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; background: #fff; }
+.kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.kinds button { height: 44px; border-radius: 10px; border: 2px solid var(--k); background: var(--k-bg); font-weight: 700; font-size: 14px; color: #4d4d4d; }
+.kinds button[aria-pressed="true"] { background: var(--k); color: #fff; } .kinds button.k-taste[aria-pressed="true"] { color: #4d4d4d; }
+.sheet .chk { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 600; } .sheet .chk input { width: 22px; height: 22px; }
+.btn.sure { background: #b13943; color: #fff; }
 </style>
 </head>
 <body>
@@ -156,7 +213,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
   <button class="hbtn" id="pricesBtn">מחירון</button>
   <div class="round" id="round"></div>
 </header>
-<main>
+<nav class="vtabs" id="vtabs"><button type="button" data-view="lab" aria-pressed="true">מתכונים</button><button type="button" data-view="plan" aria-pressed="false">לו״ז</button></nav>
+<main id="labMain">
   <div class="label">על איזה טעם עובדים?</div>
   <div class="flavors" id="flavors"></div>
 
@@ -196,6 +254,15 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 150px; }
   <button class="add" id="histBtn" style="background:var(--surface)"></button>
   <button class="add del" id="delBtn" hidden></button>
 </main>
+<section id="planMain" hidden>
+  <div class="pseg" id="pseg"><button type="button" data-pmode="week">שבועי</button><button type="button" data-pmode="month">חודשי</button><button type="button" class="padd-top" id="paddTop">+ הוספה</button></div>
+  <div class="caltools"><button type="button" id="pPrev"></button><strong id="pLabel"></strong><button type="button" id="pNext"></button><button type="button" id="pToday"></button></div>
+  <div id="pWarn"></div>
+  <div id="pBody"></div>
+  <div class="plegend"><span class="k-dev"><i></i>פיתוח</span><span class="k-taste"><i></i>טעימה</span><span class="k-cut"><i></i>קאטר</span><span class="k-other"><i></i>אחר</span><span>✓ בוצע · מסגרת אדומה: עבר התאריך ולא סומן</span></div>
+  <div class="label">איך כל טעם מתקדם</div>
+  <div class="card prog" id="pProg"></div>
+</section>
 
 <div class="sum"><div class="in">
   <div><div class="k">סה״כ בקערה</div><div class="v"><span id="sumG"></span> <small id="sumUnit">גרם</small></div><div class="s" id="sumGs"></div></div>
@@ -304,7 +371,7 @@ $("undoBtn").onclick = () => {
 };
 const save = () => {
   track();
-  try { localStorage.setItem(UIKEY, JSON.stringify({ flavor: S.flavor, version: S.version })); } catch (e) {}
+  try { localStorage.setItem(UIKEY, JSON.stringify({ flavor: S.flavor, version: S.version, view: VIEW })); } catch (e) {}
   for (const n of Object.keys(S.flavors)) if (dirty(n)) schedule(n, 900);
 };
 const cur = () => S.flavors[S.flavor];
@@ -598,6 +665,175 @@ $("winBtn").onclick = () => {
   };
 };
 
+/* ===== לו"ז: מה מכינים מתי =====
+   שורה בלו"ז = תאריך, טעם, מה עושים (פיתוח, טעימה, קאטר, אחר), הערה, ובוצע. נשמר בלשונית "לו״ז" בגיליון.
+   "איך כל טעם מתקדם" מחבר את הלו"ז לשלב של הטעם, כדי לראות שהעבודה מתכנסת ושלא נשאר טעם בלי תאריך הבא. */
+const KIND = { "פיתוח": "dev", "טעימה": "taste", "קאטר": "cut", "אחר": "other" };
+const DAYS_HE = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"], DOW = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"];
+const MONTHS_HE = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+const P = { mode: "week", week0: "", month: "" };
+let VIEW = "lab";
+const esc = t => String(t == null ? "" : t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const ymd = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const dayOf = s => new Date(s + "T12:00:00");
+const addD = (s, n) => { const d = dayOf(s); d.setDate(d.getDate() + n); return ymd(d); };
+const dm = s => Number(s.slice(8)) + "/" + Number(s.slice(5, 7));
+const todayS = () => ymd(new Date());
+const late = it => !it.done && it.date < todayS();
+const planOn = d => (S.plan || []).filter(it => it.date === d).sort((a, b) => a.flavor.localeCompare(b.flavor, "he"));
+
+function setView(v) {
+  VIEW = v === "plan" ? "plan" : "lab";
+  document.body.classList.toggle("plan", VIEW === "plan");
+  $("labMain").hidden = VIEW === "plan"; $("planMain").hidden = VIEW !== "plan";
+  [...$("vtabs").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.view === VIEW));
+  try { const ui = JSON.parse(localStorage.getItem(UIKEY)) || {}; ui.view = VIEW; localStorage.setItem(UIKEY, JSON.stringify(ui)); } catch (e) {}
+  if (VIEW === "plan") renderPlan(); else render();
+  window.scrollTo(0, 0);
+}
+$("vtabs").onclick = e => { const b = e.target.closest("[data-view]"); if (b && S) setView(b.dataset.view); };
+
+function itemHtml(it) {
+  const k = KIND[it.kind] || "other";
+  return `<div class="pitem k-${k}${it.done ? " done" : ""}${late(it) ? " late" : ""}" data-pid="${esc(it.id)}">
+    <button type="button" class="pchk" data-done="${esc(it.id)}" aria-label="סימון בוצע">${it.done ? "✓" : ""}</button>
+    <div class="pt"><b>${esc(it.flavor)}</b><span>${esc(it.kind)}${it.note ? " · " + esc(it.note) : ""}</span></div></div>`;
+}
+
+function renderPlan() {
+  const t = todayS(), week = P.mode === "week", days = [];
+  [...$("pseg").querySelectorAll("[data-pmode]")].forEach(b => b.setAttribute("aria-pressed", b.dataset.pmode === P.mode));
+  if (week) {
+    if (!P.week0) P.week0 = addD(t, -dayOf(t).getDay());
+    for (let i = 0; i < 7; i++) days.push(addD(P.week0, i));
+    $("pLabel").textContent = dm(days[0]) + " עד " + dm(days[6]);
+  } else {
+    if (!P.month) P.month = t.slice(0, 7);
+    const y = +P.month.slice(0, 4), m = +P.month.slice(5, 7) - 1, first = ymd(new Date(y, m, 1, 12));
+    const start = addD(first, -dayOf(first).getDay());
+    for (let i = 0; i < 42; i++) { const d = addD(start, i); if (i >= 28 && i % 7 === 0 && d.slice(0, 7) !== P.month) break; days.push(d); }
+    $("pLabel").textContent = MONTHS_HE[m] + " " + y;
+  }
+  $("pPrev").textContent = "→ קודם";
+  $("pNext").textContent = "הבא ←";
+  $("pToday").textContent = week ? "השבוע" : "החודש";
+  const lateN = (S.plan || []).filter(late).length;
+  $("pWarn").innerHTML = lateN ? `<div class="pwarn">⚠ ${lateN === 1 ? "דבר אחד עבר את התאריך ולא סומן כבוצע" : lateN + " דברים עברו את התאריך ולא סומנו כבוצע"}. מסמנים ✓ או מזיזים לתאריך חדש.</div>` : "";
+  if (week) {
+    $("pBody").innerHTML = '<div class="wk">' + days.map((d, i) => {
+      const list = planOn(d);
+      return `<div class="pday${d === t ? " today" : ""}"><div class="pdh"><b>${DAYS_HE[i]}</b> ${dm(d)}<span class="sp"></span><button type="button" class="padd" data-add="${d}" aria-label="הוספה ל-${dm(d)}">+</button></div>${list.map(itemHtml).join("")}</div>`;
+    }).join("") + "</div>";
+  } else {
+    const MAX = window.innerWidth >= 760 ? 4 : 2;
+    $("pBody").innerHTML = '<div class="mgrid">' + DOW.map(n => `<div class="dow">${n}</div>`).join("") + days.map(d => {
+      const list = planOn(d);
+      return `<button type="button" class="mday${d.slice(0, 7) !== P.month ? " out" : ""}${d === t ? " today" : ""}" data-day="${d}"><span class="n">${Number(d.slice(8))}</span>` +
+        list.slice(0, MAX).map(it => `<span class="mi k-${KIND[it.kind] || "other"}${it.done ? " done" : ""}${late(it) ? " late" : ""}">${esc(it.flavor)}</span>`).join("") +
+        (list.length > MAX ? `<span class="mmore">ועוד ${list.length - MAX}</span>` : "") + "</button>";
+    }).join("") + "</div>";
+  }
+  renderProgress();
+}
+
+/* לכל טעם בפיתוח: באיזה שלב הוא, כמה מהמתוכנן בוצע, ומה הבא. טעם בפיתוח בלי תאריך הבא מסומן. */
+function renderProgress() {
+  const t = todayS(), by = {};
+  (S.plan || []).forEach(it => (by[it.flavor] = by[it.flavor] || []).push(it));
+  Object.keys(S.flavors).forEach(n => { if ((S.flavors[n].stage || "dev") !== "done") by[n] = by[n] || []; });
+  const rows = Object.keys(by).map(n => {
+    const list = by[n], f = S.flavors[n], done = list.filter(x => x.done).length;
+    const next = list.filter(x => !x.done && x.date >= t).sort((a, b) => a.date.localeCompare(b.date))[0];
+    const lateN = list.filter(late).length, stage = f ? (f.stage || "dev") : "gone";
+    return { n, list, done, next, lateN, stage, f };
+  }).sort((a, b) => (b.lateN - a.lateN) || ((a.stage === "done" || a.stage === "gone") - (b.stage === "done" || b.stage === "gone")) || (!!b.next - !!a.next) || ((a.next || {}).date || "").localeCompare((b.next || {}).date || "") || a.n.localeCompare(b.n, "he"));
+  if (!rows.length) { $("pProg").innerHTML = '<div class="hint">אין עדיין טעמים.</div>'; return; }
+  $("pProg").innerHTML = rows.map(r => {
+    const st = r.stage === "gone" ? '<span class="stg gone">נמחק</span>' : r.stage === "done" ? '<span class="stg ok">עבר בקאטר ✓</span>' : r.stage === "cutter" ? '<span class="stg">בקאטר</span>' : `<span class="stg">סבב ${r.f.round}</span>`;
+    const pct = r.list.length ? Math.round(r.done / r.list.length * 100) : 0;
+    let nx;
+    if (r.lateN) nx = `<div class="nx warn">⚠ ${r.lateN === 1 ? "אחד עבר את התאריך ולא סומן" : r.lateN + " עברו את התאריך ולא סומנו"}</div>`;
+    else if (r.next) nx = `<div class="nx">הבא: ${DAYS_HE[dayOf(r.next.date).getDay()]} ${dm(r.next.date)} · ${esc(r.next.kind)}</div>`;
+    else if (r.stage === "done" || r.stage === "gone") nx = "";
+    else nx = '<div class="nx warn">אין תאריך הבא. לוחצים כדי לתכנן</div>';
+    return `<div class="pr" data-flv="${esc(r.n)}" data-plan-next="${r.next || r.stage === "done" || r.stage === "gone" ? "" : "1"}"><div class="top"><b>${esc(r.n)}</b>${st}</div>` +
+      (r.list.length ? `<div class="bar"><i style="width:${pct}%"></i></div><div class="nx">בוצעו ${r.done} מתוך ${r.list.length} בלו״ז</div>` : "") + nx + "</div>";
+  }).join("");
+}
+
+function openPlanItem(it, date, flavor) {
+  const isNew = !it;
+  it = it || { date: date || todayS(), flavor: flavor || S.flavor || Object.keys(S.flavors)[0] || "", kind: "פיתוח", note: "", done: false };
+  const names = Object.keys(S.flavors); if (it.flavor && !names.includes(it.flavor)) names.push(it.flavor);
+  openSheet(`<h3>${isNew ? "הוספה ללו״ז" : "עריכה בלו״ז"}</h3>
+    <label class="fld" for="pDate">תאריך</label><input type="date" id="pDate" value="${esc(it.date)}">
+    <label class="fld" for="pFlavor">טעם</label><select id="pFlavor">${names.map(n => `<option${n === it.flavor ? " selected" : ""}>${esc(n)}</option>`).join("")}</select>
+    <div class="fld">מה עושים</div><div class="kinds" id="pKinds">${Object.keys(KIND).map(k => `<button type="button" class="k-${KIND[k]}" data-kind="${k}" aria-pressed="${k === it.kind}">${k}</button>`).join("")}</div>
+    <label class="fld" for="pNote">הערה</label><input class="txt" id="pNote" maxlength="140" value="${esc(it.note)}" placeholder="למשל: שלוש גרסאות לטעימה">
+    <label class="chk"><input type="checkbox" id="pDone"${it.done ? " checked" : ""}> בוצע</label>
+    <div class="row-btns"><button type="button" class="btn primary" id="pSave">שמירה</button>${isNew ? "" : '<button type="button" class="btn danger" id="pDel">מחיקה</button>'}<button type="button" class="btn" id="pCancel">ביטול</button></div>`);
+  let kind = it.kind;
+  $("pKinds").onclick = e => { const b = e.target.closest("[data-kind]"); if (!b) return; kind = b.dataset.kind; [...$("pKinds").children].forEach(x => x.setAttribute("aria-pressed", x === b)); };
+  $("pCancel").onclick = closeSheet;
+  $("pSave").onclick = () => {
+    const b = $("pSave"), d = $("pDate").value;
+    if (!d) { toast("חסר תאריך"); return; }
+    b.disabled = true;
+    Backend.call("savePlan", { id: it.id || "", date: d, flavor: $("pFlavor").value, kind, note: $("pNote").value.trim(), done: $("pDone").checked })
+      .then(r => { S.plan = r.plan; closeSheet(); renderPlan(); toast(isNew ? "נוסף ללו״ז" : "נשמר"); })
+      .catch(e => { b.disabled = false; toast(e.message); });
+  };
+  if ($("pDel")) $("pDel").onclick = () => {
+    const b = $("pDel");
+    if (!b.classList.contains("sure")) { b.classList.add("sure"); b.textContent = "בטוח? למחוק"; return; }
+    b.disabled = true;
+    Backend.call("deletePlan", { id: it.id }).then(r => { S.plan = r.plan; closeSheet(); renderPlan(); toast("נמחק מהלו״ז"); })
+      .catch(e => { b.disabled = false; toast(e.message); });
+  };
+}
+
+function openPlanDay(d) {
+  const list = planOn(d);
+  openSheet(`<h3>${DAYS_HE[dayOf(d).getDay()]} ${dm(d)}</h3>${list.length ? list.map(itemHtml).join("") : '<div class="hint">אין כלום ביום הזה.</div>'}
+    <div class="row-btns"><button type="button" class="btn primary" id="pDayAdd">+ הוספה ליום הזה</button><button type="button" class="btn" id="pDayClose">סגירה</button></div>`);
+  $("pDayAdd").onclick = () => openPlanItem(null, d);
+  $("pDayClose").onclick = closeSheet;
+}
+
+function togglePlanDone(id) {
+  const it = (S.plan || []).find(x => x.id === id); if (!it) return;
+  const dayOpen = !$("scrim").hidden;
+  it.done = !it.done; renderPlan(); if (dayOpen) openPlanDay(it.date);
+  Backend.call("savePlan", { ...it }).then(r => { S.plan = r.plan; renderPlan(); })
+    .catch(e => { it.done = !it.done; renderPlan(); toast(e.message); });
+}
+
+/* לחיצות בתוך הלו"ז ובחלון של יום */
+function planClick(e) {
+  const t = e.target;
+  let b;
+  if ((b = t.closest("[data-done]"))) { togglePlanDone(b.dataset.done); return; }
+  if ((b = t.closest("[data-add]"))) { openPlanItem(null, b.dataset.add); return; }
+  if ((b = t.closest("[data-pid]"))) { const it = (S.plan || []).find(x => x.id === b.dataset.pid); if (it) openPlanItem(it); return; }
+  if ((b = t.closest("[data-day]"))) { openPlanDay(b.dataset.day); return; }
+  if ((b = t.closest("[data-flv]"))) {
+    const n = b.dataset.flv;
+    if (b.dataset.planNext || !S.flavors[n]) openPlanItem(null, todayS(), n);
+    else { S.flavor = n; S.version = 0; setView("lab"); }
+  }
+}
+$("planMain").addEventListener("click", e => {
+  const b = e.target.closest("[data-pmode]");
+  if (b) { P.mode = b.dataset.pmode; renderPlan(); return; }
+  if (e.target.closest("#paddTop")) { openPlanItem(null, todayS()); return; }
+  planClick(e);
+});
+$("sheet").addEventListener("click", e => { if (VIEW === "plan" && e.target.closest(".pitem")) planClick(e); });
+$("pPrev").onclick = e => { e.stopPropagation(); if (P.mode === "week") P.week0 = addD(P.week0, -7); else P.month = ymd(new Date(+P.month.slice(0, 4), +P.month.slice(5, 7) - 2, 1, 12)).slice(0, 7); renderPlan(); };
+$("pNext").onclick = e => { e.stopPropagation(); if (P.mode === "week") P.week0 = addD(P.week0, 7); else P.month = ymd(new Date(+P.month.slice(0, 4), +P.month.slice(5, 7), 1, 12)).slice(0, 7); renderPlan(); };
+$("pToday").onclick = e => { e.stopPropagation(); P.week0 = ""; P.month = ""; renderPlan(); };
+window.addEventListener("resize", () => { if (VIEW === "plan" && P.mode === "month") renderPlan(); });
+
 function take(d) {
   let ui = {}; try { ui = JSON.parse(localStorage.getItem(UIKEY)) || {}; } catch (e) {}
   const keep = S ? { flavor: S.flavor, version: S.version } : ui;
@@ -605,9 +841,10 @@ function take(d) {
   const names = Object.keys(d.flavors);
   for (const n of names) { adopt(d.flavors[n]); synced[n] = lastSnap[n] = JSON.stringify(stateOf(d.flavors[n])); }
   if (!names.length) { document.querySelector("main").innerHTML = '<div class="card">עוד אין טעמים במערכת.</div>'; return; }
-  S = { materials: d.materials, flavors: d.flavors, flavor: d.flavors[keep.flavor] ? keep.flavor : names[0], version: 0 };
+  S = { materials: d.materials, flavors: d.flavors, plan: d.plan || [], flavor: d.flavors[keep.flavor] ? keep.flavor : names[0], version: 0 };
   S.version = Math.min(keep.version || 0, cur().versions.length - 1);
   render(); showSync();
+  if (VIEW === "plan" || ui.view === "plan") setView("plan");
 }
 function reload(quiet) {
   return Backend.call("load").then(take).catch(e => { if (!quiet) document.querySelector("main").innerHTML = '<div class="card">' + e.message.replace(/[<&]/g, "") + '</div>'; });
